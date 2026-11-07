@@ -1,0 +1,12 @@
+{
+  "name": "dinh-doc-lap-frontend",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:web": "npm run dev -w @ddl/web",
+    "dev:admin": "npm run dev -w @ddl/admin",
+    "dev:mobile": "npm run start -w @ddl/mobile",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "npm run build -w @ddl/web && npm run build -w @ddl/admin"
+  }
+}
