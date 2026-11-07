@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Dinh Doc Lap Guide",
+    "slug": "dinh-doc-lap-guide",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": { "bundleIdentifier": "vn.example.dinhdoclap" },
+    "android": { "package": "vn.example.dinhdoclap" }
+  }
+}

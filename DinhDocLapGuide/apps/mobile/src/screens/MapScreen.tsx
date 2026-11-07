@@ -1,0 +1,69 @@
+import { resolveContent, track, LANGUAGES, type Poi } from '@ddl/shared';
+import { useState } from 'react';
+import { FlatList, Pressable, Text, View } from 'react-native';
+import MapView from '../components/MapView';
+import { useApp } from '../context';
+import { colors, common } from '../theme';
+
+/** UC2 – Bản đồ toàn màn hình; chạm số để mở điểm. Có chuyển sang danh sách (A1) */
+export default function MapScreen() {
+  const { lang, setLang, pois, loaded, loadError, reload, heard, tr, go } = useApp();
+  const [showList, setShowList] = useState(false);
+
+  const open = (p: Poi, how: 'map' | 'list') => {
+    track('poi_open', { poiId: p.id, how });
+    go('poi', p.id);
+  };
+  const nextLang = () => {
+    const i = LANGUAGES.findIndex((l) => l.code === lang);
+    setLang(LANGUAGES[(i + 1) % LANGUAGES.length].code);
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
+      <View style={{ flexDirection: 'row', gap: 8, padding: 12, alignItems: 'center' }}>
+        <Pressable style={[common.btn, { flex: 1 }]} onPress={() => go('qr')}>
+          <Text style={common.btnText}>{tr('scanQr')}</Text>
+        </Pressable>
+        <Pressable style={common.btn} onPress={() => setShowList(!showList)}>
+          <Text style={common.btnText}>{showList ? tr('navMap') : tr('list')}</Text>
+        </Pressable>
+        <Pressable style={common.btn} onPress={nextLang}>
+          <Text style={common.btnText}>{lang.toUpperCase()}</Text>
+        </Pressable>
+      </View>
+
+      {!loaded && <Text style={[common.muted, { padding: 16 }]}>{tr('loading')}</Text>}
+      {loaded && loadError && pois.length === 0 && (
+        <View style={{ padding: 16, gap: 10 }}>
+          <Text style={common.notice}>{tr('loadError')}</Text>
+          <Pressable style={[common.btn, common.btnPrimary]} onPress={reload}><Text style={common.btnTextPrimary}>{tr('retry')}</Text></Pressable>
+        </View>
+      )}
+
+      {showList ? (
+        <FlatList
+          data={pois}
+          keyExtractor={(p) => p.id}
+          contentContainerStyle={{ padding: 12, gap: 8 }}
+          renderItem={({ item }) => {
+            const r = resolveContent(item.published, lang);
+            return (
+              <Pressable style={[common.btn, { flexDirection: 'row', justifyContent: 'flex-start', gap: 12, padding: 10 }]} onPress={() => open(item, 'list')}>
+                <View style={{ width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: heard.has(item.id) ? colors.ok : colors.brand }}>
+                  <Text style={{ color: '#fff', fontWeight: '700' }}>{item.number}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontWeight: '600', color: colors.fg }}>{r.content?.name}</Text>
+                  <Text style={common.muted} numberOfLines={1}>{r.content?.description}</Text>
+                </View>
+              </Pressable>
+            );
+          }}
+        />
+      ) : (
+        <MapView pois={pois} heard={heard} onPick={(p) => open(p, 'map')} />
+      )}
+    </View>
+  );
+}
