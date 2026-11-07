@@ -1,0 +1,25 @@
+name: Build mobile
+
+# Chạy khi gắn tag, ví dụ: git tag mobile-v0.1.0 && git push --tags
+# Cần: tạo tài khoản Expo, chạy `eas init` trong apps/mobile, rồi thêm EXPO_TOKEN vào GitHub Secrets.
+on:
+  push:
+    tags: ['mobile-v*']
+  workflow_dispatch:
+
+jobs:
+  eas-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      - run: eas build --platform android --profile preview --non-interactive --no-wait
+        working-directory: apps/mobile

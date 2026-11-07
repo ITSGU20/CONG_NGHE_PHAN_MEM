@@ -1,0 +1,29 @@
+name: Build admin
+
+# Admin cần địa chỉ riêng. Mẫu này build và lưu bản build; thêm bước deploy theo nơi bạn chọn (Vercel, Netlify, Firebase...).
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/admin/**'
+      - 'packages/shared/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build -w @ddl/admin
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: admin-dist
+          path: apps/admin/dist
