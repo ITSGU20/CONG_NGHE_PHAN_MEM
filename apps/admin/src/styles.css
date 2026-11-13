@@ -237,3 +237,80 @@ th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line);
 }
 
 
+
+/* ---------- Nhật ký chỉnh sửa ---------- */
+
+.audit-filter {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 16px;
+  margin: 18px 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.audit-filter label {
+  width: 240px;
+  margin: 0;
+}
+
+.audit-filter label span {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.audit-filter input {
+  width: 100%;
+  min-height: 40px;
+}
+
+.audit-filter button {
+  min-height: 40px;
+}
+
+.audit-count {
+  margin-left: auto;
+  padding: 10px 0;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.audit-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.audit-table {
+  min-width: 700px;
+}
+
+.audit-table th {
+  color: var(--muted);
+  font-size: .85rem;
+  white-space: nowrap;
+}
+
+.audit-empty {
+  padding: 32px;
+  text-align: center;
+  color: var(--muted);
+}
+
+@media (max-width: 700px) {
+  .audit-filter {
+    align-items: stretch;
+  }
+
+  .audit-filter label {
+    width: 100%;
+  }
+
+  .audit-count {
+    margin-left: 0;
+  }
+}
+    

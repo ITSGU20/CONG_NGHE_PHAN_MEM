@@ -420,27 +420,66 @@ export function langCompleteness(pois: Poi[], lang: LangCode): { done: number; t
   return { done, total: pois.length };
 }
 
-export async function getAudit(): Promise<AuditEntry[]> {
+
+export async function getAudit(date?: string): Promise<AuditEntry[]> {
   const sb = getBackend();
+
+  // Tính khoảng thời gian của ngày được chọn theo múi giờ Việt Nam (UTC+7)
+  let startIso: string | undefined;
+  let endIso: string | undefined;
+
+  if (date) {
+    const start = new Date(`${date}T00:00:00+07:00`);
+    const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+
+    startIso = start.toISOString();
+    endIso = end.toISOString();
+  }
+
   if (sb) {
-    const { data, error } = await sb
+    const query = sb
       .from('audit_log')
       .select('id, at, username, lang, action, pois(number)')
-      .order('at', { ascending: false })
-      .limit(200);
+      .order('at', { ascending: false });
+
+    const { data, error } = date
+      ? await query.gte('at', startIso!).lt('at', endIso!)
+      : await query.limit(200);
+
     fail(error);
+
     return (data ?? []).map((r) => {
       const poi = r.pois as unknown as { number: number } | null;
-      return { id: String(r.id), at: r.at as string, user: r.username as string, poiId: poi ? `Điểm ${poi.number}` : '-', lang: (r.lang ?? undefined) as LangCode | undefined, action: r.action as string };
+
+      return {
+        id: String(r.id),
+        at: r.at as string,
+        user: r.username as string,
+        poiId: poi ? `Điểm ${poi.number}` : '-',
+        lang: (r.lang ?? undefined) as LangCode | undefined,
+        action: r.action as string,
+      };
     });
   }
+
   await delay();
+
   const pois = loadPois();
-  return loadAudit().map((a) => {
+
+  const logs = loadAudit().map((a) => {
     const p = pois.find((x) => x.id === a.poiId);
     return { ...a, poiId: p ? `Điểm ${p.number}` : '-' };
   });
+
+  if (!date) return logs;
+
+  return logs.filter((a) => {
+    const time = new Date(a.at).getTime();
+    return time >= new Date(startIso!).getTime()
+      && time < new Date(endIso!).getTime();
+  });
 }
+
 
 /* ================================= Dashboard =============================== */
 let tick = 0;
