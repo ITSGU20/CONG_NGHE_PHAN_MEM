@@ -2,13 +2,13 @@
 
 Monorepo FE cho PRD "Ứng dụng Thuyết minh Đa ngôn ngữ Dinh Độc Lập" (v1.6).
 
-| Thư mục | Công nghệ | Use case |
-|---|---|---|
-| `apps/web` | React.js (Vite) | UC1, UC2, UC3, UC5 – web du khách (`/poi/:id` là đích của mã QR) |
-| `apps/mobile` | React Native (Expo) | UC1, UC2, UC3, UC5 – app du khách |
-| `apps/admin` | React.js (Vite) | UC6, UC7, UC8 – trang quản trị, chỉ desktop |
-| `packages/shared` | TypeScript | Kiểu dữ liệu, API (Supabase hoặc giả), i18n, trình phát, sự kiện |
-| `supabase/schema.sql` | SQL | Bảng, phân quyền (RLS), hàm, kho ảnh, dữ liệu mẫu |
+| Thư mục               | Công nghệ         | Use case                                                                  |
+| ----------------------- | ------------------- | ------------------------------------------------------------------------- |
+| `apps/web`            | React.js (Vite)     | UC1, UC2, UC3, UC5 – web du khách (`/poi/:id` là đích của mã QR) |
+| `apps/mobile`         | React Native (Expo) | UC1, UC2, UC3, UC5 – app du khách                                       |
+| `apps/admin`          | React.js (Vite)     | UC6, UC7, UC8 – trang quản trị, chỉ desktop                           |
+| `packages/shared`     | TypeScript          | Kiểu dữ liệu, API (Supabase hoặc giả), i18n, trình phát, sự kiện |
+| `supabase/schema.sql` | SQL                 | Bảng, phân quyền (RLS), hàm, kho ảnh, dữ liệu mẫu                 |
 
 ## Chạy thử (không cần Supabase)
 
@@ -48,11 +48,13 @@ Nút **Phát** đọc phần *nội dung thuyết minh* thành tiếng bằng gi
    select id, email, 'admin' from auth.users where email = 'ban@example.com'
    on conflict (id) do update set role = excluded.role;
    ```
+
    Vai trò: `admin`, `editor` (sửa nội dung, không xem dashboard), `viewer` (chỉ xem dashboard).
 4. **Project Settings → API**: chép *Project URL* và *anon public key* vào `apps/web/.env.local` và `apps/admin/.env.local` (xem `.env.example`), mobile dùng biến `EXPO_PUBLIC_*`. Chạy lại `npm run dev:web`.
 5. Đăng nhập admin bằng email, vào "Điểm tham quan", sửa và tải ảnh lên, xuất bản.
 
 Điều cần nhớ về bảo mật:
+
 - FE chỉ dùng **anon key**. Không bao giờ đưa `service_role` key vào code hay commit lên Git.
 - Du khách (chưa đăng nhập) không đọc bảng trực tiếp; chỉ gọi hàm `get_visitor_pois` và `track_event`. Quyền sửa nội dung và xem dashboard do RLS và hàm ở phía máy chủ kiểm tra, không dựa vào việc FE ẩn nút.
 - Hạn chế hiện tại: hàm `track_event` cho phép ai cũng gửi sự kiện nên số liệu có thể bị gửi giả. Nếu cần chặt hơn thì thêm giới hạn tần suất sau.
