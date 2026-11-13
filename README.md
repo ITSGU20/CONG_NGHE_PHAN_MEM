@@ -43,6 +43,7 @@ Nút **Phát** đọc phần *nội dung thuyết minh* thành tiếng bằng gi
 1. Tạo project tại supabase.com.
 2. **SQL Editor → New query**, dán toàn bộ `supabase/schema.sql` rồi **Run** (an toàn khi chạy lại). File tạo bảng, phân quyền RLS, các hàm, bucket ảnh `poi-media` và 8 điểm mẫu.
 3. **Authentication → Users → Add user**: tạo tài khoản quản trị (email + mật khẩu, tick *Auto Confirm User*). Rồi chạy lệnh cấp vai trò (đổi email):
+
    ```sql
    insert into public.profiles (id, username, role)
    select id, email, 'admin' from auth.users where email = 'ban@example.com'
