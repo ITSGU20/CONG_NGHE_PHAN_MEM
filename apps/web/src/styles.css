@@ -20,6 +20,9 @@ h1 { margin: 0; }
 .langsel { justify-self: end; display: flex; align-items: center; gap: 8px; padding: 0 12px; height: 40px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); }
 .langsel select { background: transparent; border: 0; color: var(--fg); font: inherit; cursor: pointer; outline: none; }
 .langsel select option { color: #111; }
+.floors { position: absolute; z-index: 2; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 6px; }
+.floors button { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: rgba(10,15,29,.85); color: #fff; cursor: pointer; text-align: left; }
+.floors button.on { background: var(--red2); border-color: #fff; font-weight: 700; }
 
 /* ---------- nút ---------- */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 12px; cursor: pointer; text-decoration: none; }

@@ -1,12 +1,12 @@
 import {
-  CAPTION_MAX, ConflictError, DESC_MAX, discardDraft, getAdminPois, LANGUAGES, MAX_IMAGES_PER_POI, metaOf, missingRequired,
+  CAPTION_MAX, ConflictError, DESC_MAX, discardDraft, FLOORS, floorName, floorOf, getAdminPois, LANGUAGES, MAX_IMAGES_PER_POI, metaOf, missingRequired,
   NAME_MAX, publishDraft, resolveContent, saveDraft, TTS_LOCALE, validateDraft,
   type LangCode, type Poi, type PoiLangContent, type PoiMeta, type PoiType, type PoiVersion,
 } from '@ddl/shared';
 import { useEffect, useMemo, useState, type MouseEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth';
-import MapArt from '../MapArt';
+import { FLOOR_IMG } from '../floorMaps';
 import { uploadImage } from '../media';
 import { qrSvg } from '../qr';
 import { confirmLeave, setUnsaved } from '../unsaved';
@@ -252,13 +252,18 @@ export default function PoiEditPage() {
       </div>
 
       <h3 className="sectionhead">Vị trí trên bản đồ</h3>
-      <p className="muted">Chạm vào bản đồ để đặt số của điểm (vị trí lưu theo tỷ lệ % trên ảnh).</p>
+      <label>Tầng
+      <select value={meta.floor ?? 0} onChange={(e) => setMeta({ floor: Number(e.target.value) })}>
+       {FLOORS.map((f) => <option key={f.id} value={f.id}>{floorName(f.id, 'vi')}</option>)}
+      </select>
+      </label>
+      <p className="muted">Chạm vào bản đồ để đặt số của điểm (vị trí lưu theo tỷ lệ % trên ảnh của tầng đang chọn).</p>
       <div className="mapbox" onClick={onMapClick} role="img" aria-label="Bản đồ: chạm để đặt vị trí điểm">
-        <MapArt />
-        {all.filter((p) => p.id !== poi.id).map((p) => (
-          <span key={p.id} className="dot" style={{ left: `${p.mapX}%`, top: `${p.mapY}%` }}>{p.number}</span>
-        ))}
-        <span className="dot me" style={{ left: `${meta.mapX}%`, top: `${meta.mapY}%` }}>{Number.isNaN(meta.number) ? '?' : meta.number}</span>
+      <img className="mapart" src={FLOOR_IMG[meta.floor ?? 0]} alt="" draggable={false} />
+       {all.filter((p) => p.id !== poi.id && floorOf(p) === (meta.floor ?? 0)).map((p) => (
+      <span key={p.id} className="dot" style={{ left: `${p.mapX}%`, top: `${p.mapY}%` }}>{p.number}</span>
+      ))}
+      <span className="dot me" style={{ left: `${meta.mapX}%`, top: `${meta.mapY}%` }}>{Number.isNaN(meta.number) ? '?' : meta.number}</span>
       </div>
       <div className="grid2">
         <label>Vị trí ngang X (%)<input type="number" min={0} max={100} step={0.1} value={meta.mapX} onChange={(e) => setMeta({ mapX: Number(e.target.value) })} /></label>

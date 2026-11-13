@@ -8,4 +8,5 @@ export * from './supabase';
 export * from './api';
 export * from './analytics';
 export * from './usePlayer';
+export * from './floors';
 export { demoAccounts } from './mockData';

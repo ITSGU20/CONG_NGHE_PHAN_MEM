@@ -6,6 +6,7 @@ import { storage } from './storage';
 import { getBackend } from './supabase';
 import type { AuditEntry, LangCode, LoginResult, Poi, PoiMeta, PoiVersion, Role, Stats, StatsFilter } from './types';
 import { LANGUAGES } from './types';
+import { FLOORS } from './floors';
 
 /**
  * Lớp gọi dữ liệu. Có cấu hình Supabase (initBackend) => dùng Supabase; không thì dùng dữ liệu giả (localStorage).
@@ -66,6 +67,7 @@ interface PoiRow {
   type: Poi['type'];
   map_x: number;
   map_y: number;
+  floor_no: number;
   wheelchair: boolean;
   hidden: boolean;
   poi_versions?: {
@@ -94,6 +96,7 @@ function rowToPoi(r: PoiRow): Poi {
     number: r.number,
     internalName: r.internal_name,
     type: r.type,
+    floor: r.floor_no ?? 0,
     mapX: Number(r.map_x),
     mapY: Number(r.map_y),
     wheelchair: r.wheelchair,
@@ -230,7 +233,7 @@ export async function getAdminPois(): Promise<Poi[]> {
   if (sb) {
     const { data, error } = await sb
       .from('pois')
-      .select('id, number, internal_name, type, map_x, map_y, wheelchair, hidden, poi_versions(kind, images, content, meta, updated_at)')
+      .select('id, number, internal_name, type, map_x, map_y, floor_no, wheelchair, hidden, poi_versions(kind, images, content, meta, updated_at)')
       .order('number');
     fail(error);
     return ((data ?? []) as unknown as PoiRow[]).map(rowToPoi);
@@ -248,7 +251,7 @@ export function poiStatus(p: Poi): PoiStatus {
 
 /** Các trường chung đang hiệu lực của điểm (dùng làm giá trị ban đầu khi mở trang sửa) */
 export const metaOf = (p: Poi): PoiMeta =>
-  p.draft?.meta ?? { number: p.number, internalName: p.internalName, type: p.type, wheelchair: !!p.wheelchair, mapX: p.mapX, mapY: p.mapY };
+  p.draft?.meta ?? { number: p.number, internalName: p.internalName, type: p.type, wheelchair: !!p.wheelchair, mapX: p.mapX, mapY: p.mapY, floor: p.floor ?? 0 };
 
 /** Dấu thời gian của bản mà người sửa đang mở; gửi kèm khi lưu để phát hiện hai người cùng sửa (E4) */
 export const editToken = (p: Poi): string | null => (p.draft ?? p.published)?.updatedAt ?? null;
@@ -273,6 +276,7 @@ export function validateDraft(v: PoiVersion, otherNumbers: number[]): string[] {
   const m = v.meta;
   if (m) {
     if (!Number.isInteger(m.number) || m.number < 1) errs.push('Số thứ tự phải là số nguyên dương');
+    if (!FLOORS.some((f) => f.id === m.floor)) errs.push('Tầng không hợp lệ');
     else if (otherNumbers.includes(m.number)) errs.push(`Số thứ tự ${m.number} đã được dùng cho điểm khác`);
     if (!m.internalName.trim()) errs.push('Tên nội bộ không được để trống');
     if (!(m.mapX >= 0 && m.mapX <= 100 && m.mapY >= 0 && m.mapY <= 100)) errs.push('Vị trí nằm ngoài ảnh bản đồ');
@@ -304,7 +308,7 @@ export async function createPoi(user: string): Promise<string> {
   const all = loadPois();
   const number = Math.max(0, ...all.map((p) => p.number)) + 1;
   const id = `poi-${Date.now()}`;
-  all.push({ id, number, internalName: `Điểm mới ${number}`, type: 'indoor', mapX: 50, mapY: 50, wheelchair: false, hidden: false });
+  all.push({ id, number, internalName: `Điểm mới ${number}`, type: 'indoor', mapX: 50, mapY: 50, wheelchair: false, hidden: false, floor: 0 });
   savePois(all);
   mockAudit(user, id, 'Thêm điểm');
   return id;

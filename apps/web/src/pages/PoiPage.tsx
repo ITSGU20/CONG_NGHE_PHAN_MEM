@@ -7,6 +7,7 @@ import { IconBack, IconMap, IconNext, IconPause, IconPlay } from '../components/
 import { useVoicesReady, webTts } from '../tts';
 
 const isUrl = (s?: string) => !!s && (/^(https?:)?\/\//.test(s) || s.startsWith('/') || s.startsWith('data:'));
+const wellFormedId = (s?: string) => !!s && /^(poi-\d+|[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12})$/i.test(s);
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 /** UC3 – Nghe thuyết minh (đọc nội dung thành tiếng). Cũng là trang đích của mã QR (UC5). */
@@ -38,7 +39,7 @@ export default function PoiPage() {
               <button className="btn primary" onClick={reload}>{tr('retry')}</button>
             </>
           ) : (
-            <p>{tr('notFound')}</p>
+           <p>{wellFormedId(id) ? tr('notPublished') : tr('invalidCode')}</p>
           )}
           <button className="btn" onClick={() => nav('/map')}>{tr('backToMap')}</button>
         </main>
@@ -131,7 +132,7 @@ function PoiView({ poi }: { poi: Poi }) {
             </div>
 
             <div className="poi-foot">
-              <span className="muted">{tr('category')}</span>
+              <span />
               {next ? (
                 <button className="linkbtn" onClick={() => nav(`/poi/${next.id}`, { state: { how: 'next' } })}>
                   {tr('nextPoint')} <IconNext size={18} />

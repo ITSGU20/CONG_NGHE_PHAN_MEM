@@ -8,10 +8,9 @@ import { SafeAreaView, StyleSheet } from 'react-native';
 import LanguageScreen from './src/screens/LanguageScreen';
 import MapScreen from './src/screens/MapScreen';
 import PoiScreen from './src/screens/PoiScreen';
-import QrScreen from './src/screens/QrScreen';
 import { AppContext, type AppCtx } from './src/context';
 
-type Screen = { name: 'language' } | { name: 'map' } | { name: 'poi'; id: string } | { name: 'qr' };
+type Screen = { name: 'language' } | { name: 'map' } | { name: 'poi'; id: string };
 
 /** Điều hướng đơn giản bằng state (đủ cho 4 màn hình); có thể thay bằng React Navigation sau */
 export default function App() {
@@ -21,7 +20,13 @@ export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const lastLoad = useRef(0);
-  const [heard, setHeard] = useState<Set<string>>(new Set());
+  const [heard, setHeard] = useState<Set<string>>(() => {
+  try {
+    return new Set(JSON.parse(storage.get('ddl.heard') ?? '[]'));
+  } catch {
+    return new Set();
+  }
+});
 
   useEffect(() => startSession(lang ?? 'vi'), []); // eslint-disable-line react-hooks/exhaustive-deps
   const reload = useCallback(() => {
@@ -49,7 +54,13 @@ export default function App() {
     setLangState(l);
     track('language_select', { lang: l });
   }, []);
-  const markHeard = useCallback((id: string) => setHeard((p) => new Set(p).add(id)), []);
+  const markHeard = useCallback((id: string) => {
+  setHeard((prev) => {
+    const next = new Set(prev).add(id);
+    storage.set('ddl.heard', JSON.stringify([...next]));
+    return next;
+  });
+}, []);
 
   const ctx = useMemo<AppCtx>(
     () => ({
@@ -74,7 +85,6 @@ export default function App() {
         {screen.name === 'language' && <LanguageScreen />}
         {screen.name === 'map' && <MapScreen />}
         {screen.name === 'poi' && <PoiScreen key={screen.id + ctx.lang} poiId={screen.id} />}
-        {screen.name === 'qr' && <QrScreen />}
       </SafeAreaView>
     </AppContext.Provider>
   );

@@ -1,4 +1,4 @@
-import { resolveContent, track, type Poi } from '@ddl/shared';
+import { resolveContent, track, FLOORS, DEFAULT_FLOOR, floorName, floorOf, type Poi } from '@ddl/shared';  // MỚI: import thêm
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../App';
@@ -6,12 +6,13 @@ import Header from '../components/Header';
 import MapView from '../components/MapView';
 import { IconMap, IconMinus, IconPlus, IconReset, TypeIcon } from '../components/icons';
 
-/** UC2 – Xem bản đồ và chọn điểm. Desktop: danh sách trái, bản đồ phải. Điện thoại: xếp dọc. */
 export default function MapPage() {
   const { lang, pois, loaded, loadError, reload, heard, tr } = useApp();
   const nav = useNavigate();
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
+  const [floor, setFloor] = useState(DEFAULT_FLOOR);                          // MỚI
+  const floorPois = pois.filter((p) => floorOf(p) === floor);  
 
   const open = (p: Poi, how: 'map' | 'list') => {
     track('poi_open', { poiId: p.id, how });
@@ -35,7 +36,7 @@ export default function MapPage() {
                 {tr('loadError')} <button className="retrybtn" onClick={reload}>{tr('retry')}</button>
               </li>
             )}
-            {pois.map((p) => {
+           {floorPois.map((p) => {                                
               const r = resolveContent(p.published, lang);
               return (
                 <li key={p.id}>
@@ -59,8 +60,17 @@ export default function MapPage() {
         </aside>
 
         <section className="mappanel">
+           <div className="floors" role="tablist">                             {/* MỚI: nguyên khối này */}
+            {FLOORS.map((f) => (
+              <button key={f.id} role="tab" aria-selected={f.id === floor}
+                className={f.id === floor ? 'on' : ''}
+                onClick={() => { setFloor(f.id); setZoom(1); }}>
+                {floorName(f.id, lang)}
+              </button>
+            ))}
+          </div>
           <div className="mapscroll">
-            <MapView pois={pois} heard={heard} hoverId={hoverId} zoom={zoom} onHover={setHoverId} onPick={(p) => open(p, 'map')} />
+            <MapView floor={floor} pois={pois} heard={heard} hoverId={hoverId} zoom={zoom} onHover={setHoverId} onPick={(p) => open(p, 'map')} />  {/* MỚI: thêm floor={floor} */}
           </div>
           <div className="zoomctl">
             <button onClick={() => setZoom(clamp(zoom + 0.4))} aria-label={tr('zoomIn')} title={tr('zoomIn')}><IconPlus /></button>

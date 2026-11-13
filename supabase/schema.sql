@@ -134,6 +134,7 @@ returns jsonb language sql stable security definer set search_path = public as $
       'type', p.type,
       'mapX', p.map_x,
       'mapY', p.map_y,
+      'floor', p.floor_no,
       'wheelchair', p.wheelchair,
       'hidden', false,
       'published', jsonb_build_object('images', to_jsonb(v.images), 'content', v.content)
@@ -259,7 +260,8 @@ begin
       type          = d.meta ->> 'type',
       wheelchair    = coalesce((d.meta ->> 'wheelchair')::boolean, false),
       map_x         = (d.meta ->> 'mapX')::numeric,
-      map_y         = (d.meta ->> 'mapY')::numeric
+      map_y         = (d.meta ->> 'mapY')::numeric,
+      floor_no = coalesce((d.meta ->> 'floor')::int, 0)
     where id = p_poi;
   end if;
 
@@ -319,6 +321,7 @@ begin
   mx := (p_meta ->> 'mapX')::numeric;
   my := (p_meta ->> 'mapY')::numeric;
   if n is null or n < 1 then raise exception 'Số thứ tự phải là số nguyên dương'; end if;
+  if coalesce((p_meta ->> 'floor')::int, 0) not between -1 and 4 then raise exception 'Tầng không hợp lệ'; end if;
   if exists (select 1 from public.pois where number = n and id <> p_poi) then raise exception 'Số thứ tự % đã được dùng cho điểm khác', n; end if;
   if coalesce(trim(p_meta ->> 'internalName'), '') = '' then raise exception 'Tên nội bộ không được để trống'; end if;
   if (p_meta ->> 'type') not in ('outdoor', 'indoor', 'mixed') then raise exception 'Loại điểm không hợp lệ'; end if;
@@ -341,7 +344,7 @@ begin
   base_i := coalesce(cur.images, pub.images, '{}');
   base_m := case when cur.poi_id is not null and cur.meta <> '{}'::jsonb then cur.meta
                  else jsonb_build_object('number', poi_row.number, 'internalName', poi_row.internal_name, 'type', poi_row.type,
-                                         'wheelchair', poi_row.wheelchair, 'mapX', poi_row.map_x, 'mapY', poi_row.map_y) end;
+                                         'wheelchair', poi_row.wheelchair, 'mapX', poi_row.map_x, 'mapY', poi_row.map_y, 'floor', poi_row.floor_no) end;
   select username into uname from public.profiles where id = auth.uid();
   uname := coalesce(uname, '?');
 
@@ -434,19 +437,19 @@ create policy "poi-media: biên tập xóa" on storage.objects for delete to aut
 -- ---------------------------------------------------------------------
 -- 5. DỮ LIỆU MẪU: 8 điểm, nội dung tiếng Việt và tiếng Anh (NỘI DUNG MẪU – Ban quản lý sẽ thay)
 -- ---------------------------------------------------------------------
-with src(num, vi, en, typ, x, y, wc) as (
+with src(num, vi, en, typ, x, y, fl, wc) as (
   values
-    (1, 'Cổng chính và sân vườn',            'Main gate and garden',        'outdoor', 49, 90, true),
-    (2, 'Xe tăng trong sân trước',           'Tanks in the front yard',     'outdoor', 41, 75, true),
-    (3, 'Phòng Khánh tiết',                  'Reception Hall',              'indoor',  49, 62, true),
-    (4, 'Phòng làm việc của Tổng thống',     'President''s Office',         'indoor',  58, 52, false),
-    (5, 'Phòng Đại yến',                     'Banquet Hall',                'indoor',  40, 45, true),
-    (6, 'Phòng Ngoại giao đoàn',             'Diplomatic Corps Room',       'indoor',  49, 35, false),
-    (7, 'Tầng thượng và sân đỗ trực thăng',  'Rooftop and helipad',         'mixed',   53, 18, false),
-    (8, 'Tầng hầm và hầm chỉ huy',           'Basement and command bunker', 'indoor',  37, 18, false)
+    (1, 'Cổng chính và sân vườn',            'Main gate and garden',        'outdoor', 50, 93,  0, true),
+    (2, 'Xe tăng trong sân trước',           'Tanks in the front yard',     'outdoor', 31, 77,  0, true),
+    (3, 'Phòng Khánh tiết',                  'Reception Hall',              'indoor',  50, 59,  1, true),
+    (4, 'Phòng làm việc của Tổng thống',     'President''s Office',         'indoor',  77, 35,  2, false),
+    (5, 'Phòng Đại yến',                     'Banquet Hall',                'indoor',  23, 35,  1, true),
+    (6, 'Phòng Ngoại giao đoàn',             'Diplomatic Corps Room',       'indoor',  23, 35,  2, false),
+    (7, 'Tầng thượng và sân đỗ trực thăng',  'Rooftop and helipad',         'mixed',   50, 38,  4, false),
+    (8, 'Tầng hầm và hầm chỉ huy',           'Basement and command bunker', 'indoor',  29, 28, -1, false)
 ), ins as (
-  insert into public.pois (number, internal_name, type, map_x, map_y, wheelchair)
-  select num, en, typ, x, y, wc from src
+  insert into public.pois (number, internal_name, type, map_x, map_y, floor_no, wheelchair)
+  select num, en, typ, x, y, fl, wc from src
   on conflict (number) do nothing
   returning id, number
 )

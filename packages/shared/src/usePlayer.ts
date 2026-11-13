@@ -128,6 +128,7 @@ export function usePlayer({ poiId, lang, selectedLang, paragraphs, engine, onLis
       if (acc + durations[i] > target) break;
       acc += durations[i];
     }
+    if (ratio <= 0.02) tracker.current.reset(); // kéo về đầu = lần phát mới (mục 10.1)
     activeRef.current = idx;
     setActive(idx);
     setInPara(0);

@@ -13,7 +13,7 @@ export interface AppCtx {
   heard: Set<string>;
   markHeard: (id: string) => void;
   tr: (k: Parameters<typeof t>[1]) => string;
-  go: (name: 'language' | 'map' | 'poi' | 'qr', id?: string) => void;
+  go: (name: 'language' | 'map' | 'poi', id?: string) => void;
 }
 
 export const AppContext = createContext<AppCtx>(null as never);

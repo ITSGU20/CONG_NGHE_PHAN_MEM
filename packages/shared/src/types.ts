@@ -28,6 +28,7 @@ export interface PoiMeta {
   wheelchair: boolean;
   mapX: number;
   mapY: number;
+  floor: number;
 }
 
 /** Một phiên bản nội dung: dùng cho cả "đang xuất bản" và "bản nháp" (BR-11) */
@@ -47,6 +48,7 @@ export interface Poi {
   type: PoiType;
   mapX: number; // vị trí theo % trên ảnh bản đồ (0-100)
   mapY: number;
+  floor: number;
   wheelchair?: boolean; // có lối đi xe lăn
   hidden: boolean; // ẩn/hiện có hiệu lực trực tiếp, không qua nháp
   published?: PoiVersion; // chưa xuất bản lần nào thì undefined

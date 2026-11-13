@@ -1,6 +1,6 @@
-import { resolveContent, track, LANGUAGES, type Poi } from '@ddl/shared';
+import { resolveContent, track, LANGUAGES, FLOORS, DEFAULT_FLOOR, floorName, floorOf, type Poi } from '@ddl/shared';
 import { useState } from 'react';
-import { FlatList, Pressable, Text, View } from 'react-native';
+import { FlatList, Pressable, ScrollView, Text, View } from 'react-native';
 import MapView from '../components/MapView';
 import { useApp } from '../context';
 import { colors, common } from '../theme';
@@ -9,6 +9,9 @@ import { colors, common } from '../theme';
 export default function MapScreen() {
   const { lang, setLang, pois, loaded, loadError, reload, heard, tr, go } = useApp();
   const [showList, setShowList] = useState(false);
+
+  const [floor, setFloor] = useState(DEFAULT_FLOOR);
+  const floorPois = pois.filter((p) => floorOf(p) === floor);
 
   const open = (p: Poi, how: 'map' | 'list') => {
     track('poi_open', { poiId: p.id, how });
@@ -22,17 +25,22 @@ export default function MapScreen() {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flexDirection: 'row', gap: 8, padding: 12, alignItems: 'center' }}>
-        <Pressable style={[common.btn, { flex: 1 }]} onPress={() => go('qr')}>
-          <Text style={common.btnText}>{tr('scanQr')}</Text>
-        </Pressable>
-        <Pressable style={common.btn} onPress={() => setShowList(!showList)}>
+        <Pressable style={[common.btn, { flex: 1 }]} onPress={() => setShowList(!showList)}>
           <Text style={common.btnText}>{showList ? tr('navMap') : tr('list')}</Text>
         </Pressable>
         <Pressable style={common.btn} onPress={nextLang}>
           <Text style={common.btnText}>{lang.toUpperCase()}</Text>
         </Pressable>
       </View>
-
+      <View style={{ height: 52 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 12, alignItems: 'center' }}>
+      {FLOORS.map((f) => (
+      <Pressable key={f.id} onPress={() => setFloor(f.id)} style={[common.btn, f.id === floor && common.btnPrimary]}>
+        <Text style={f.id === floor ? common.btnTextPrimary : common.btnText}>{floorName(f.id, lang)}</Text>
+      </Pressable>
+    ))}
+  </ScrollView>
+</View>
       {!loaded && <Text style={[common.muted, { padding: 16 }]}>{tr('loading')}</Text>}
       {loaded && loadError && pois.length === 0 && (
         <View style={{ padding: 16, gap: 10 }}>
@@ -43,7 +51,7 @@ export default function MapScreen() {
 
       {showList ? (
         <FlatList
-          data={pois}
+         data={floorPois}
           keyExtractor={(p) => p.id}
           contentContainerStyle={{ padding: 12, gap: 8 }}
           renderItem={({ item }) => {
@@ -62,7 +70,7 @@ export default function MapScreen() {
           }}
         />
       ) : (
-        <MapView pois={pois} heard={heard} onPick={(p) => open(p, 'map')} />
+        <MapView floor={floor} pois={pois} heard={heard} onPick={(p) => open(p, 'map')} />
       )}
     </View>
   );
