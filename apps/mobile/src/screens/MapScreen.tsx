@@ -32,26 +32,30 @@ export default function MapScreen() {
           <Text style={common.btnText}>{lang.toUpperCase()}</Text>
         </Pressable>
       </View>
+
       <View style={{ height: 52 }}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 12, alignItems: 'center' }}>
-      {FLOORS.map((f) => (
-      <Pressable key={f.id} onPress={() => setFloor(f.id)} style={[common.btn, f.id === floor && common.btnPrimary]}>
-        <Text style={f.id === floor ? common.btnTextPrimary : common.btnText}>{floorName(f.id, lang)}</Text>
-      </Pressable>
-    ))}
-  </ScrollView>
-</View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 12, alignItems: 'center' }}>
+          {FLOORS.map((f) => (
+            <Pressable key={f.id} onPress={() => setFloor(f.id)} style={[common.btn, f.id === floor && common.btnPrimary]}>
+              <Text style={f.id === floor ? common.btnTextPrimary : common.btnText}>{floorName(f.id, lang)}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
+
       {!loaded && <Text style={[common.muted, { padding: 16 }]}>{tr('loading')}</Text>}
       {loaded && loadError && pois.length === 0 && (
         <View style={{ padding: 16, gap: 10 }}>
           <Text style={common.notice}>{tr('loadError')}</Text>
-          <Pressable style={[common.btn, common.btnPrimary]} onPress={reload}><Text style={common.btnTextPrimary}>{tr('retry')}</Text></Pressable>
+          <Pressable style={[common.btn, common.btnPrimary]} onPress={reload}>
+            <Text style={common.btnTextPrimary}>{tr('retry')}</Text>
+          </Pressable>
         </View>
       )}
 
       {showList ? (
         <FlatList
-         data={floorPois}
+          data={floorPois}
           keyExtractor={(p) => p.id}
           contentContainerStyle={{ padding: 12, gap: 8 }}
           renderItem={({ item }) => {
@@ -70,7 +74,9 @@ export default function MapScreen() {
           }}
         />
       ) : (
-        <MapView floor={floor} pois={pois} heard={heard} onPick={(p) => open(p, 'map')} />
+        <View style={{ flex: 1 }}>
+          <MapView floor={floor} pois={pois} heard={heard} onPick={(p) => open(p, 'map')} />
+        </View>
       )}
     </View>
   );
