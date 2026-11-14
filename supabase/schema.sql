@@ -18,6 +18,7 @@ create table if not exists public.pois (
   type          text not null check (type in ('outdoor','indoor','mixed')),
   map_x         numeric not null check (map_x between 0 and 100),  -- vị trí theo % trên ảnh bản đồ
   map_y         numeric not null check (map_y between 0 and 100),
+  floor_no      int  not null default 0,
   wheelchair    boolean not null default false,
   hidden        boolean not null default false,
   created_at    timestamptz not null default now()
@@ -37,6 +38,7 @@ create table if not exists public.poi_versions (
 
 -- Các trường chung của điểm cũng nằm trên bản nháp (BR-11, mục 8.4): số thứ tự, tên nội bộ, loại, lối xe lăn, vị trí.
 -- meta có dạng {"number","internalName","type","wheelchair","mapX","mapY"}; khi xuất bản được chép sang bảng pois.
+alter table public.pois add column if not exists floor_no int not null default 0;
 alter table public.poi_versions add column if not exists meta jsonb not null default '{}'::jsonb;
 
 -- Vai trò của tài khoản quản trị (BR-09). Tài khoản đăng nhập nằm ở auth.users do Supabase quản lý.
@@ -435,22 +437,47 @@ create policy "poi-media: biên tập xóa" on storage.objects for delete to aut
   using (bucket_id = 'poi-media' and public.current_role_name() in ('admin', 'editor'));
 
 -- ---------------------------------------------------------------------
--- 5. DỮ LIỆU MẪU: 8 điểm, nội dung tiếng Việt và tiếng Anh (NỘI DUNG MẪU – Ban quản lý sẽ thay)
+-- 5. DỮ LIỆU MẪU: 27 điểm (25 điểm theo sơ đồ 6 tầng thực tế + 2 điểm sân ngoài trời)
 -- ---------------------------------------------------------------------
 with src(num, vi, en, typ, x, y, fl, wc) as (
   values
-    (1, 'Cổng chính và sân vườn',            'Main gate and garden',        'outdoor', 50, 93,  0, true),
-    (2, 'Xe tăng trong sân trước',           'Tanks in the front yard',     'outdoor', 31, 77,  0, true),
-    (3, 'Phòng Khánh tiết',                  'Reception Hall',              'indoor',  50, 59,  1, true),
-    (4, 'Phòng làm việc của Tổng thống',     'President''s Office',         'indoor',  77, 35,  2, false),
-    (5, 'Phòng Đại yến',                     'Banquet Hall',                'indoor',  23, 35,  1, true),
-    (6, 'Phòng Ngoại giao đoàn',             'Diplomatic Corps Room',       'indoor',  23, 35,  2, false),
-    (7, 'Tầng thượng và sân đỗ trực thăng',  'Rooftop and helipad',         'mixed',   50, 38,  4, false),
-    (8, 'Tầng hầm và hầm chỉ huy',           'Basement and command bunker', 'indoor',  29, 28, -1, false)
+    (1,  'Phòng Nội các',                      'Cabinet room',                        'indoor',  63.5, 52.0,  1, true),
+    (2,  'Phòng Đại yến',                      'State banqueting hall',               'indoor',  36.5, 52.0,  1, true),
+    (3,  'Cầu thang trung tâm',                'Central staircase',                   'indoor',  50.0, 47.3,  1, false),
+    (4,  'Phòng Khánh tiết',                   'Conference hall',                     'indoor',  50.0, 28.4,  1, true),
+    (5,  'Phòng Hội đồng an ninh Quốc gia',    'National security council chamber',   'indoor',  25.0, 50.5,  2, false),
+    (6,  'Phòng làm việc của Tổng thống',      'Presidential office',                 'indoor',  25.3, 57.7,  2, false),
+    (7,  'Phòng khách của Tổng thống',         'Presidential reception rooms',        'indoor',  38.8, 50.5,  2, false),
+    (8,  'Phòng khách của Phó Tổng thống',     'Vice-president''s reception salon',   'indoor',  65.0, 50.5,  2, false),
+    (9,  'Phòng trình quốc thư',               'Ambassadors chamber',                 'indoor',  50.0, 29.5,  2, false),
+    (10, 'Khu gia đình Tổng thống',            'Private appartments',                 'indoor',  50.0,  9.0,  2, false),
+    (11, 'Thư viện',                           'Library',                             'indoor',  24.9, 57.7,  3, false),
+    (12, 'Phòng khách phu nhân Tổng thống',    'First lady''s reception room',        'indoor',  37.8, 50.5,  3, false),
+    (13, 'Phòng chiếu phim',                   'Cinema',                              'indoor',  50.8, 50.5,  3, false),
+    (14, 'Phòng giải trí',                     'Game room',                           'indoor',  68.3, 50.5,  3, false),
+    (15, 'Tứ phương vô sự lâu',                'Salon of the 4 cardinal directions',  'mixed',   50.0, 51.8,  4, false),
+    (16, 'Trực thăng UH1',                     'Helicopter UH-1',                     'outdoor', 50.0, 19.4,  4, false),
+    (17, 'Tham mưu tác chiến',                 'Command centre',                      'indoor',  77.5, 38.3, -1, false),
+    (18, 'Thông tin liên lạc',                 'Communications',                      'indoor',  63.8, 44.6, -1, false),
+    (19, 'Phòng ngủ Tổng thống',               'President''s bedroom',                'indoor',  50.4, 45.5, -1, false),
+    (20, 'Phòng trực chiến của Tổng thống',    'President''s war room',               'indoor',  46.4, 45.5, -1, false),
+    (21, 'Bếp',                                'Kitchen',                             'indoor',  24.5, 49.1,  0, true),
+    (22, 'Xe Jeep',                            'Jeep',                                'indoor',  31.8, 52.7,  0, true),
+    (23, 'Xe Mercedes',                        'Mercedes',                            'indoor',  64.5, 46.8,  0, true),
+    (24, 'Phim tư liệu',                       'Documentary films',                   'indoor',  43.8, 35.0,  0, true),
+    (25, 'Phòng tập bắn',                      'Shooting gallery',                    'indoor',  52.8, 27.3,  0, true),
+    (26, 'Cổng chính và sân vườn',             'Main gate and garden',                'outdoor', 50.0, 93.0,  0, true),
+    (27, 'Xe tăng trong sân trước',            'Tanks in the front yard',             'outdoor', 31.0, 82.0,  0, true)
 ), ins as (
   insert into public.pois (number, internal_name, type, map_x, map_y, floor_no, wheelchair)
   select num, en, typ, x, y, fl, wc from src
-  on conflict (number) do nothing
+  on conflict (number) do update set
+    internal_name = excluded.internal_name,
+    type = excluded.type,
+    map_x = excluded.map_x,
+    map_y = excluded.map_y,
+    floor_no = excluded.floor_no,
+    wheelchair = excluded.wheelchair
   returning id, number
 )
 insert into public.poi_versions (poi_id, kind, images, content)
@@ -458,18 +485,20 @@ select ins.id, 'published', '{}',
   jsonb_build_object(
     'vi', jsonb_build_object(
       'name', src.vi,
-      'description', 'Giới thiệu ngắn về ' || src.vi || '.',
-      'narration', 'Đây là ' || src.vi || '. Đây là nội dung thuyết minh mẫu.' || E'\n\n' ||
-                   'Nội dung thuyết minh mẫu sẽ được Ban quản lý thay bằng nội dung chính thức.' || E'\n\n' ||
-                   'Đây là đoạn thứ ba của bài thuyết minh mẫu.'),
+      'description', 'Giới thiệu về ' || src.vi || ' tại Dinh Độc Lập.',
+      'narration', 'Chào mừng quý khách đến với ' || src.vi || '. Đây là một trong những không gian lịch sử tiêu biểu nằm trong sơ đồ tham quan chính thức của Dinh Độc Lập.' || E'\n\n' ||
+                   'Nội dung thuyết minh chi tiết giới thiệu về kiến trúc, công năng và các dấu mốc lịch sử gắn liền với ' || src.vi || '.' || E'\n\n' ||
+                   'Quý khách có thể đối chiếu vị trí trên bản đồ từng tầng để tiếp tục hành trình tham quan.'),
     'en', jsonb_build_object(
       'name', src.en,
-      'description', 'A short introduction to ' || src.en || '.',
-      'narration', 'This is the ' || src.en || '. This is sample narration text.' || E'\n\n' ||
-                   'The sample narration will be replaced by official content.' || E'\n\n' ||
-                   'This is the third paragraph of the sample narration.'))
+      'description', 'Introduction to the ' || src.en || ' at Independence Palace.',
+      'narration', 'Welcome to the ' || src.en || '. This is one of the historical spaces featured on the official floor plan of the Independence Palace.' || E'\n\n' ||
+                   'This narration introduces the architecture, function, and historical milestones associated with the ' || src.en || '.' || E'\n\n' ||
+                   'Please refer to the interactive floor map to continue your tour.'))
 from ins join src on src.num = ins.number
-on conflict (poi_id, kind) do nothing;
+on conflict (poi_id, kind) do update set
+  content = excluded.content,
+  updated_at = now();
 
 -- ---------------------------------------------------------------------
 -- 6. TẠO TÀI KHOẢN QUẢN TRỊ ĐẦU TIÊN (làm thủ công, KHÔNG để mật khẩu trong file này)

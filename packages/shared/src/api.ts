@@ -12,7 +12,7 @@ import { FLOORS } from './floors';
  * Lớp gọi dữ liệu. Có cấu hình Supabase (initBackend) => dùng Supabase; không thì dùng dữ liệu giả (localStorage).
  * Tên hàm và kiểu trả về giống nhau ở hai chế độ nên giao diện không cần biết đang dùng chế độ nào.
  */
-const POIS_KEY = 'ddl.pois';
+const POIS_KEY = 'ddl.pois.v2';
 const AUDIT_KEY = 'ddl.audit';
 const LOCK_KEY = 'ddl.admin.lock';
 const delay = (ms = 120) => new Promise((r) => setTimeout(r, ms));
