@@ -64,7 +64,12 @@ Nút **Phát** đọc phần *nội dung thuyết minh* thành tiếng bằng gi
 
 - Bản đồ là hình minh hoạ vẽ bằng SVG (`PalaceMapArt.tsx`). Khi có sơ đồ thật của Ban quản lý, thay bằng `<img>` (xem ghi chú trong file) và chỉnh lại toạ độ các số trong bảng `pois` (`map_x`, `map_y`, tính theo %).
 - Ảnh cổng chính (`apps/web/public/img/poi-1.jpg`) cắt từ hình mẫu của bạn, chỉ để chạy thử. Hãy thay bằng ảnh có bản quyền khi tải ảnh qua admin.
-- Quét QR trên mobile mới có ô nhập số in dưới mã; cần thêm `expo-camera` để quét thật.
+
+## Cập nhật admin
+
+* Xóa cụm `tạo mã QR` trong danh sách chức năng đã bổ sung.
+* Xóa dòng mô tả biến môi trường `VITE_WEB_URL`.
+* Giữ nguyên các nội dung khác.
 
 ## CI/CD (`.github/workflows`)
 
