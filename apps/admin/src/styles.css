@@ -72,10 +72,7 @@ th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line);
 .thumbwrap .thumb { width: 160px; height: 100px; cursor: grab; }
 .thumbwrap .thumb.over { outline: 2px solid var(--brand); }
 .thumbwrap input { font-size: .8rem; padding: 4px 8px; }
-.qrbox { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin: 12px 0; }
-.qrbox svg { width: 200px; height: 200px; background: #fff; border-radius: 6px; }
-.qrbox code { word-break: break-all; font-size: .85rem; }
-.qrbox .info { flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 8px; }
+
 .previewbox img { max-width: 100%; max-height: 240px; border-radius: 10px; }
 .previewbox .chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
 .sectionhead { margin: 28px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); }

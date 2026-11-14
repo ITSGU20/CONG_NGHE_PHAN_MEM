@@ -3,12 +3,12 @@ import {
   NAME_MAX, publishDraft, resolveContent, saveDraft, TTS_LOCALE, validateDraft,
   type LangCode, type Poi, type PoiLangContent, type PoiMeta, type PoiType, type PoiVersion,
 } from '@ddl/shared';
-import { useEffect, useMemo, useState, type MouseEvent } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { FLOOR_IMG } from '../floorMaps';
 import { uploadImage } from '../media';
-import { qrSvg } from '../qr';
+
 import { confirmLeave, setUnsaved } from '../unsaved';
 
 const empty: PoiLangContent = { name: '', description: '', narration: '' };
@@ -16,9 +16,7 @@ const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
 const round1 = (n: number) => Math.round(n * 10) / 10;
 const clamp = (n: number) => Math.min(100, Math.max(0, n));
 const isUrl = (s: string) => /^(https?:|data:|\/)/.test(s);
-const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
-/** Địa chỉ gốc của web du khách; đặt VITE_WEB_URL khi triển khai để mã QR trỏ đúng nơi */
-const WEB_URL = ((import.meta.env.VITE_WEB_URL as string | undefined) ?? 'http://localhost:5173').replace(/\/+$/, '');
+
 
 /** Chuyển chú thích của một ảnh sang URL mới (thay ảnh) hoặc xóa (neu = null) ở mọi ngôn ngữ */
 function moveCaptions(content: PoiVersion['content'], old: string, neu: string | null): PoiVersion['content'] {
@@ -47,7 +45,7 @@ export default function PoiEditPage() {
   const [msg, setMsg] = useState('');
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState(false);
-  const [qrOpen, setQrOpen] = useState(false);
+ 
   const [uploading, setUploading] = useState(false);
   const [conflict, setConflict] = useState<string | null>(null); // E4
   const [kept, setKept] = useState<PoiVersion | null>(null); // phần đang nhập được giữ lại khi tải bản mới
@@ -318,9 +316,7 @@ export default function PoiEditPage() {
         </label>
       </div>
 
-      <h3 className="sectionhead">Mã QR</h3>
-      <button className="btn" onClick={() => setQrOpen(!qrOpen)}>{qrOpen ? 'Ẩn mã QR' : 'Tạo mã QR'}</button>
-      {qrOpen && <QrPanel poi={poi} number={meta.number} name={meta.internalName} />}
+
 
       <h3 className="sectionhead">Nội dung theo ngôn ngữ</h3>
       <div className="tabs">
@@ -366,51 +362,7 @@ export default function PoiEditPage() {
 }
 
 /** Mã QR chỉ chứa đường dẫn có mã điểm (BR-08, UC8 A3); đổi số thứ tự không làm mã đã in mất hiệu lực vì dùng mã điểm */
-function QrPanel({ poi, number, name }: { poi: Poi; number: number; name: string }) {
-  const [base, setBase] = useState(WEB_URL);
-  const url = `${base.trim().replace(/\/+$/, '')}/poi/${poi.id}`;
-  const svg = useMemo(() => {
-    try {
-      return qrSvg(url, 256);
-    } catch {
-      return '';
-    }
-  }, [url]);
 
-  const download = () => {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
-    a.download = `qr-diem-${number}.svg`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-  };
-  const print = () => {
-    const w = window.open('', '_blank', 'width=480,height=620');
-    if (!w) return;
-    w.document.write(`<title>QR điểm ${number}</title><body style="font-family:sans-serif;text-align:center;padding:24px">${svg}<h2 style="margin:8px 0 0">${number}</h2><p style="margin:4px 0">${esc(name)}</p></body>`);
-    w.document.close();
-    w.focus();
-    w.print();
-  };
-
-  return (
-    <div className="qrbox">
-      {svg ? <div dangerouslySetInnerHTML={{ __html: svg }} /> : <p className="err">Không tạo được mã QR (đường dẫn quá dài).</p>}
-      <div className="info">
-        <label>Địa chỉ web du khách
-          <input value={base} onChange={(e) => setBase(e.target.value)} />
-        </label>
-        <span>Nội dung mã: <code>{url}</code></span>
-        <span className="muted">Số in dưới mã để du khách nhập tay nếu không quét được: <b>{Number.isNaN(number) ? '?' : number}</b></span>
-        {!poi.published && <span className="notice">Điểm chưa xuất bản: quét mã sẽ báo chưa có nội dung cho đến khi xuất bản.</span>}
-        <div className="actions no-print">
-          <button className="btn" onClick={download} disabled={!svg}>Tải SVG</button>
-          <button className="btn" onClick={print} disabled={!svg}>In</button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /** Xem trước đúng như du khách thấy (BR-07 dùng tiếng Anh nếu thiếu bản dịch); "Phát thử" không gửi sự kiện vào dashboard (BR-12) */
 function Preview({ form, lang }: { form: PoiVersion; lang: LangCode }) {
