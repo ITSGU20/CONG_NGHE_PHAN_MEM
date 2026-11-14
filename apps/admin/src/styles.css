@@ -653,3 +653,52 @@ th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line);
     flex-direction: column;
   }
 }
+
+
+
+/* Line chart - Lượt nghe theo ngày */
+
+.dashboard-line-chart-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.dashboard-line-chart {
+  display: block;
+  width: 100%;
+  min-width: 540px;
+  height: auto;
+  overflow: visible;
+}
+
+.dashboard-line-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 4 5;
+}
+
+.dashboard-line-axis-label {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.dashboard-line-area {
+  fill: var(--brand);
+  opacity: 0.10;
+}
+
+.dashboard-line-path {
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dashboard-line-point {
+  fill: var(--card);
+  stroke: var(--brand);
+  stroke-width: 2.5;
+  cursor: pointer;
+}

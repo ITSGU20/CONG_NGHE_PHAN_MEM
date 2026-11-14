@@ -87,7 +87,7 @@ export default function DashboardPage() {
   }
 
   const maxLang = Math.max(1, ...Object.values(s.byLanguage));
-  const maxDay = Math.max(1, ...s.byDay.map((d) => d.count));
+  //const maxDay = Math.max(1, ...s.byDay.map((d) => d.count));
 
   const hasData =
     s.byDay.some((d) => d.count > 0) ||
@@ -251,24 +251,15 @@ export default function DashboardPage() {
             </section>
 
             <section className="dashboard-chart-card">
-              <div className="dashboard-chart-heading">
-                <div>
-                  <h3>Lượt nghe theo ngày</h3>
-                  <p>{s.byDay.length} ngày trong khoảng đã chọn</p>
-                </div>
-              </div>
+  <div className="dashboard-chart-heading">
+    <div>
+      <h3>Lượt nghe theo ngày</h3>
+      <p>{s.byDay.length} ngày trong khoảng đã chọn</p>
+    </div>
+  </div>
 
-              <div className="dashboard-bars dashboard-day-bars">
-                {s.byDay.map((d) => (
-                  <Bar
-                    key={d.date}
-                    label={d.date}
-                    value={d.count}
-                    max={maxDay}
-                  />
-                ))}
-              </div>
-            </section>
+  <LineChart data={s.byDay} />
+</section>
           </div>
         ) : (
           <div className="empty">
@@ -334,6 +325,135 @@ function Bar({
       </div>
 
       <b>{value.toLocaleString('vi-VN')}</b>
+    </div>
+  );
+}
+
+function LineChart({
+  data,
+}: {
+  data: { date: string; count: number }[];
+}) {
+  const width = Math.max(760, data.length * 18);
+  const height = 300;
+
+  const left = 55;
+  const right = 20;
+  const top = 20;
+  const bottom = 45;
+
+  const chartWidth = width - left - right;
+  const chartHeight = height - top - bottom;
+
+  const maxValue = Math.max(1, ...data.map((d) => d.count));
+  const step = Math.max(1, Math.ceil(maxValue / 4));
+  const yMax = step * 4;
+
+  const getX = (index: number) =>
+    data.length <= 1
+      ? left + chartWidth / 2
+      : left + (index / (data.length - 1)) * chartWidth;
+
+  const getY = (value: number) =>
+    top + chartHeight - (value / yMax) * chartHeight;
+
+  const points = data
+    .map((d, index) => `${getX(index)},${getY(d.count)}`)
+    .join(' ');
+
+  const labelIndexes = Array.from(
+    new Set([
+      0,
+      Math.round((data.length - 1) * 0.25),
+      Math.round((data.length - 1) * 0.5),
+      Math.round((data.length - 1) * 0.75),
+      data.length - 1,
+    ]),
+  ).filter((index) => index >= 0 && index < data.length);
+
+  if (data.length === 0) {
+    return <div className="empty">Chưa có dữ liệu lượt nghe theo ngày.</div>;
+  }
+
+  return (
+    <div className="dashboard-line-chart-wrapper">
+      <svg
+        className="dashboard-line-chart"
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label="Biểu đồ đường lượt nghe theo ngày"
+      >
+        {/* Đường lưới và trục Y */}
+        {Array.from({ length: 5 }, (_, i) => {
+          const value = step * i;
+          const y = getY(value);
+
+          return (
+            <g key={i}>
+              <line
+                x1={left}
+                y1={y}
+                x2={width - right}
+                y2={y}
+                className="dashboard-line-grid"
+              />
+
+              <text
+                x={left - 10}
+                y={y + 4}
+                textAnchor="end"
+                className="dashboard-line-axis-label"
+              >
+                {value.toLocaleString('vi-VN')}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Vùng màu dưới đường biểu diễn */}
+        {data.length > 1 && (
+          <polygon
+            points={`${left},${getY(0)} ${points} ${getX(data.length - 1)},${getY(0)}`}
+            className="dashboard-line-area"
+          />
+        )}
+
+        {/* Đường biểu diễn */}
+        {data.length > 1 && (
+          <polyline
+            points={points}
+            className="dashboard-line-path"
+          />
+        )}
+
+        {/* Điểm dữ liệu */}
+        {data.map((d, index) => (
+          <circle
+            key={d.date}
+            cx={getX(index)}
+            cy={getY(d.count)}
+            r={4}
+            className="dashboard-line-point"
+          >
+            <title>
+              {d.date}: {d.count.toLocaleString('vi-VN')} lượt nghe
+            </title>
+          </circle>
+        ))}
+
+        {/* Nhãn ngày trên trục X */}
+        {labelIndexes.map((index) => (
+          <text
+            key={index}
+            x={getX(index)}
+            y={height - 15}
+            textAnchor="middle"
+            className="dashboard-line-axis-label"
+          >
+            {data[index].date}
+          </text>
+        ))}
+      </svg>
     </div>
   );
 }
