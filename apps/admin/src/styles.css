@@ -702,3 +702,41 @@ th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line);
   stroke-width: 2.5;
   cursor: pointer;
 }
+/* Nút quay lại trang danh sách điểm tham quan */
+
+.poi-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  padding: 9px 15px;
+  margin-bottom: 18px;
+
+  color: var(--fg);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  transition: all 0.2s ease;
+}
+
+.poi-back-button:hover {
+  color: var(--brand);
+  background: var(--bg);
+  border-color: var(--brand);
+  transform: translateX(-3px);
+}
+
+.poi-back-button:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
+}
+
+.poi-back-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}

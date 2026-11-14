@@ -208,7 +208,16 @@ export default function PoiEditPage() {
 
   return (
     <div className="pad">
-      <Link to="/pois" onClick={(e) => { if (!confirmLeave()) e.preventDefault(); }}>← Danh sách</Link>
+      <Link
+  to="/pois"
+  className="poi-back-button"
+  onClick={(e) => {
+    if (!confirmLeave()) e.preventDefault();
+  }}
+>
+  <span className="poi-back-icon">←</span>
+  <span>Quay lại danh sách</span>
+</Link>
       <h1>Điểm {meta.number}: {meta.internalName} <span className={`tag ${dirty || poi.draft ? 'changed' : 'published'}`}>{state}</span></h1>
 
       {conflict && (
