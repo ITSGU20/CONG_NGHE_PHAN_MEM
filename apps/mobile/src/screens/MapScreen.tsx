@@ -1,6 +1,6 @@
 import { resolveContent, track, LANGUAGES, FLOORS, DEFAULT_FLOOR, floorName, floorOf, type Poi } from '@ddl/shared';
 import { useState } from 'react';
-import { FlatList, Pressable, ScrollView, Text, View } from 'react-native';
+import { FlatList, Pressable, Text, View } from 'react-native';
 import MapView from '../components/MapView';
 import { useApp } from '../context';
 import { colors, common } from '../theme';
@@ -33,16 +33,18 @@ export default function MapScreen() {
         </Pressable>
       </View>
 
-      <View style={{ height: 52 }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 12, alignItems: 'center' }}>
-          {FLOORS.map((f) => (
-            <Pressable key={f.id} onPress={() => setFloor(f.id)} style={[common.btn, { flexShrink: 0 }, f.id === floor && common.btnPrimary]}>
-              <Text numberOfLines={1} style={[f.id === floor ? common.btnTextPrimary : common.btnText, { flexShrink: 0 }]}>
-                {floorName(f.id, lang)}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 12, paddingBottom: 8 }}>
+        {FLOORS.map((f) => (
+          <Pressable
+            key={f.id}
+            onPress={() => setFloor(f.id)}
+            style={[common.btn, { flexShrink: 0, paddingHorizontal: 12 }, f.id === floor && common.btnPrimary]}
+          >
+            <Text numberOfLines={1} style={[f.id === floor ? common.btnTextPrimary : common.btnText, { flexShrink: 0 }]}>
+              {floorName(f.id, lang)}
+            </Text>
+          </Pressable>
+        ))}
       </View>
 
       {!loaded && <Text style={[common.muted, { padding: 16 }]}>{tr('loading')}</Text>}
