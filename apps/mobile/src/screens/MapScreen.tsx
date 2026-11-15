@@ -36,8 +36,10 @@ export default function MapScreen() {
       <View style={{ height: 52 }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 12, alignItems: 'center' }}>
           {FLOORS.map((f) => (
-            <Pressable key={f.id} onPress={() => setFloor(f.id)} style={[common.btn, f.id === floor && common.btnPrimary]}>
-              <Text style={f.id === floor ? common.btnTextPrimary : common.btnText}>{floorName(f.id, lang)}</Text>
+            <Pressable key={f.id} onPress={() => setFloor(f.id)} style={[common.btn, { flexShrink: 0 }, f.id === floor && common.btnPrimary]}>
+              <Text numberOfLines={1} style={[f.id === floor ? common.btnTextPrimary : common.btnText, { flexShrink: 0 }]}>
+                {floorName(f.id, lang)}
+              </Text>
             </Pressable>
           ))}
         </ScrollView>
