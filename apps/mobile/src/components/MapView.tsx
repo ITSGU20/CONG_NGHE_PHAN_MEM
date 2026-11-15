@@ -1,7 +1,7 @@
 import { floorOf, type FloorId, type Poi } from '@ddl/shared';
 import { useState } from 'react';
 import {
-  ImageBackground,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -30,6 +30,7 @@ export default function MapView({ floor, pois, heard, onPick }: Props) {
   // Chiều rộng vừa khít màn hình (trừ 24px padding 2 bên), nhân với mức zoom
   const baseWidth = Math.max(screenWidth - 24, 300);
   const mapWidth = baseWidth * zoom;
+  const mapHeight = (mapWidth * 555) / 1000;
 
   // Kích thước nút chấm điểm tự điều chỉnh theo mức zoom
   const pinSize = zoom > 1.3 ? 34 : 26;
@@ -62,12 +63,12 @@ export default function MapView({ floor, pois, heard, onPick }: Props) {
           contentContainerStyle={styles.horizontalScroll}
           showsHorizontalScrollIndicator={zoom > 1}
         >
-          <ImageBackground
-            source={FLOOR_IMG[floor]}
-            style={[styles.map, { width: mapWidth }]}
-            imageStyle={styles.img}
-            resizeMode="stretch"
-          >
+          <View style={[styles.map, { width: mapWidth, height: mapHeight }]}>
+            <Image
+              source={FLOOR_IMG[floor]}
+              style={{ position: 'absolute', top: 0, left: 0, width: mapWidth, height: mapHeight }}
+              resizeMode="stretch"
+            />
             {pois
               .filter((p) => floorOf(p) === floor)
               .map((p) => (
@@ -94,7 +95,7 @@ export default function MapView({ floor, pois, heard, onPick }: Props) {
                   </Text>
                 </Pressable>
               ))}
-          </ImageBackground>
+          </View>
         </ScrollView>
       </ScrollView>
     </View>
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
   zoomBtnText: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.fg,
+    color: colors.bg,
   },
   zoomReset: {
     paddingHorizontal: 8,
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
   zoomLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: colors.fg,
+    color: colors.bg,
   },
   verticalScroll: {
     alignItems: 'center',
@@ -147,14 +148,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   map: {
-    aspectRatio: 1000 / 555,
     borderRadius: 12,
     borderWidth: 2,
     borderColor: colors.line,
     overflow: 'hidden',
-  },
-  img: {
-    borderRadius: 10,
   },
   pin: {
     position: 'absolute',
