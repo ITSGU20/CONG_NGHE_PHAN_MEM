@@ -8,8 +8,8 @@ export const FLOORS: { id: FloorId; names: Record<LangCode, string> }[] = [
   { id: 3, names: { vi: 'Tầng 3', en: 'Floor 3', zh: '第3层', ja: '3フロア', ko: '3층', fr: 'Étage 3' } },
   { id: 2, names: { vi: 'Tầng 2', en: 'Floor 2', zh: '第2层', ja: '2フロア', ko: '2층', fr: 'Étage 2' } },
   { id: 1, names: { vi: 'Tầng 1', en: 'Floor 1', zh: '第1层', ja: '1フロア', ko: '1층', fr: 'Étage 1' } },
-  { id: 0, names: { vi: 'Tầng trệt', en: 'Ground floor', zh: '底层', ja: 'グランドフロア', ko: '지상층', fr: 'Rez-de-chaussée' } },
-  { id: -1, names: { vi: 'Tầng hầm', en: 'Basement', zh: '地下室', ja: '地下', ko: '지하', fr: 'Sous-sol' } },
+  { id: 0, names: { vi: 'Trệt', en: 'Ground floor', zh: '底层', ja: 'グランドフロア', ko: '지상층', fr: 'Rez-de-chaussée' } },
+  { id: -1, names: { vi: 'Hầm', en: 'Basement', zh: '地下室', ja: '地下', ko: '지하', fr: 'Sous-sol' } },
 ];
 
 export const DEFAULT_FLOOR: FloorId = 0;
