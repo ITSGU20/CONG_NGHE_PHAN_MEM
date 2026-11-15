@@ -11,7 +11,7 @@ initBackend({ url: import.meta.env.VITE_SUPABASE_URL, anonKey: import.meta.env.V
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <App />
     </BrowserRouter>
   </React.StrictMode>,

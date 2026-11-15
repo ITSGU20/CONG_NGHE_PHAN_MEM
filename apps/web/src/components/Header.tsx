@@ -3,6 +3,9 @@ import { Link, NavLink } from 'react-router-dom';
 import { useApp } from '../App';
 import { IconGlobe } from './icons';
 
+/** Trang quản trị nằm cùng site: /<repo>/admin/ khi đã deploy, cổng 5174 khi chạy thử */
+const ADMIN_URL = import.meta.env.DEV ? 'http://localhost:5174/' : `${import.meta.env.BASE_URL}admin/`;
+
 export default function Header() {
   const { lang, setLang, tr } = useApp();
   return (
@@ -19,6 +22,7 @@ export default function Header() {
         <NavLink to="/" end>{tr('navHome')}</NavLink>
         <NavLink to="/map">{tr('navMap')}</NavLink>
         <NavLink to="/about">{tr('navAbout')}</NavLink>
+        <a href={ADMIN_URL}>{tr('navAdmin')}</a>
       </nav>
       <label className="langsel">
         <IconGlobe size={18} />

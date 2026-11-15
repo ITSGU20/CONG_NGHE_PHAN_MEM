@@ -74,8 +74,7 @@ Nút **Phát** đọc phần *nội dung thuyết minh* thành tiếng bằng gi
 ## CI/CD (`.github/workflows`)
 
 - `ci.yml`: mỗi Pull Request chạy typecheck và build.
-- `deploy-web.yml`: merge vào `main` thì build và đưa web lên GitHub Pages.
-- `deploy-admin.yml`: build admin và lưu bản build; thêm bước deploy theo nơi bạn chọn.
-- `build-mobile.yml`: gắn tag `mobile-v*` thì build bằng EAS (cần `EXPO_TOKEN`).
+- `deploy-pages.yml`: merge vào `main` thì build web + admin + mobile (bản web) và đưa lên **một** site GitHub Pages: `/` (web), `/admin/` (quản trị), `/mobile/` (app mobile).
+- `build-mobile.yml`: gắn tag `mobile-v*` thì build file APK bằng EAS (cần `EXPO_TOKEN`).
 
 Đặt `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` trong **GitHub → Settings → Secrets and variables → Actions**.

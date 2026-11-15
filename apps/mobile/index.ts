@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { initBackend } from '@ddl/shared';
 import { registerRootComponent } from 'expo';
 import { createElement, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import App from './App';
 
 // Biến EXPO_PUBLIC_* được Expo nhúng vào lúc build. Không có => dùng dữ liệu giả (xem .env.example)
@@ -19,7 +20,8 @@ const KEYS = ['ddl.lang', 'ddl.deviceId', 'ddl.heard'];
 // Gắn localStorage NGAY khi file được nạp (đọc từ bộ nhớ, ghi đồng thời xuống AsyncStorage).
 // Lúc này bộ nhớ còn trống, dữ liệu cũ được nạp vào ở Root bên dưới trước khi App hiện ra.
 const cache = new Map<string, string>();
-(globalThis as any).localStorage = {
+// Trên web (expo export -p web) trình duyệt đã có localStorage thật, không được ghi đè
+if (Platform.OS !== 'web') (globalThis as any).localStorage = {
   getItem: (k: string) => cache.get(k) ?? null,
   setItem: (k: string, v: string) => {
     cache.set(k, v);
@@ -31,6 +33,7 @@ const cache = new Map<string, string>();
 function Root() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
+    if (Platform.OS === 'web') return setReady(true);
     AsyncStorage.multiGet(KEYS)
       .then((pairs) => pairs.forEach(([k, v]) => v !== null && cache.set(k, v)))
       .catch(() => undefined)

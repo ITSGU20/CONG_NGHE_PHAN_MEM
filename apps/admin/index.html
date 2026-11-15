@@ -7,6 +7,13 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // GitHub Pages trả 404 cho đường dẫn con của admin; 404.html chuyển về đây, khôi phục lại đường dẫn gốc trước khi router chạy
+      (function () {
+        var r = sessionStorage.getItem('ddl.redirect');
+        if (r) { sessionStorage.removeItem('ddl.redirect'); history.replaceState(null, '', r); }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

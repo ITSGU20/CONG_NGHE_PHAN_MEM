@@ -6,6 +6,8 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "ios": { "bundleIdentifier": "vn.example.dinhdoclap" },
-    "android": { "package": "vn.example.dinhdoclap" }
+    "android": { "package": "vn.example.dinhdoclap" },
+    "web": { "bundler": "metro", "output": "single" },
+    "experiments": { "baseUrl": "/CONG_NGHE_PHAN_MEM/mobile" }
   }
 }

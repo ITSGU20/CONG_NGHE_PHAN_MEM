@@ -47,7 +47,7 @@ export default function LoginPage() {
     setError('');
     setInfo('');
     try {
-      await requestPasswordReset(username.trim(), `${window.location.origin}/reset-password`);
+      await requestPasswordReset(username.trim(), `${window.location.origin}${import.meta.env.BASE_URL}reset-password`);
       setInfo('Nếu email này đã được đăng ký, liên kết đặt lại mật khẩu (có thời hạn) đã được gửi tới hộp thư của bạn.');
     } catch (err) {
       setError((err as Error).message);
