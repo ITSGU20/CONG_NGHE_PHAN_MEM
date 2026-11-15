@@ -2,6 +2,10 @@
   "name": "dinh-doc-lap-frontend",
   "private": true,
   "workspaces": ["apps/*", "packages/*"],
+  "overrides": {
+  "react": "19.3.1",
+  "react-dom": "19.3.1"
+  },
   "scripts": {
     "dev:web": "npm run dev -w @ddl/web",
     "dev:admin": "npm run dev -w @ddl/admin",
