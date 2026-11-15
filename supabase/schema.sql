@@ -228,7 +228,17 @@ begin
                    where (l.created_at at time zone 'Asia/Ho_Chi_Minh')::date = g::date
                      and (p_lang is null or l.audio_lang = p_lang)) as n
           from generate_series(d_from::timestamp, d_to::timestamp, interval '1 day') g
-        ) y), '[]'::jsonb)
+        ) y), '[]'::jsonb),
+    'visitsByDay', coalesce((
+        select jsonb_agg(jsonb_build_object('date', to_char(d, 'YYYY-MM-DD'), 'visits', v, 'users', u) order by d)
+        from (
+          select g::date as d,
+                 (select count(*) from sessions s
+                   where (s.started_at at time zone 'Asia/Ho_Chi_Minh')::date = g::date) as v,
+                 (select count(distinct s.device_id) from sessions s
+                   where (s.started_at at time zone 'Asia/Ho_Chi_Minh')::date = g::date) as u
+          from generate_series(d_from::timestamp, d_to::timestamp, interval '1 day') g
+        ) z), '[]'::jsonb)
   ) into res;
   return res;
 end $$;

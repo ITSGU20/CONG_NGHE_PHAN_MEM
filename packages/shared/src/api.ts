@@ -495,7 +495,7 @@ export async function getStats(filter: StatsFilter = {}): Promise<Stats> {
     const d = data as Stats;
     const byLanguage = {} as Record<LangCode, number>;
     LANGUAGES.forEach((l) => (byLanguage[l.code] = Number(d.byLanguage?.[l.code] ?? 0)));
-    return { totalUsers: Number(d.totalUsers), online: Number(d.online), playing: Number(d.playing), byLanguage, byDay: d.byDay ?? [] };
+    return { totalUsers: Number(d.totalUsers), online: Number(d.online), playing: Number(d.playing), byLanguage, byDay: d.byDay ?? [], visitsByDay: d.visitsByDay ?? [] };
   }
   await delay(60);
   tick += 1;
@@ -510,5 +510,10 @@ export async function getStats(filter: StatsFilter = {}): Promise<Stats> {
     const d = new Date(to - (days - 1 - i) * DAY_MS);
     return { date: d.toISOString().slice(5, 10), count: filter.lang && filter.lang !== 'vi' ? 20 + ((i * 11) % 30) : 120 + ((i * 37) % 90) };
   });
-  return { totalUsers: 3280 + tick, online, playing: Math.min(online, wobble(17, 4)), byLanguage, byDay };
+  const visitsByDay = Array.from({ length: days }, (_, i) => {
+    const d = new Date(to - (days - 1 - i) * DAY_MS);
+    const visits = 80 + ((i * 29) % 60);
+    return { date: d.toISOString().slice(0, 10), visits, users: Math.round(visits * 0.7) };
+  });
+  return { totalUsers: 3280 + tick, online, playing: Math.min(online, wobble(17, 4)), byLanguage, byDay, visitsByDay };
 }

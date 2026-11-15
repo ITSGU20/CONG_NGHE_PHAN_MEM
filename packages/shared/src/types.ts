@@ -84,6 +84,7 @@ export interface Stats {
   playing: number; // đang sử dụng
   byLanguage: Record<LangCode, number>;
   byDay: { date: string; count: number }[];
+  visitsByDay: { date: string; visits: number; users: number }[];
 }
 
 /** Bộ lọc dashboard (UC7 bước 6). Ngày dạng YYYY-MM-DD, múi giờ Việt Nam. Bỏ trống = 7 ngày gần nhất, mọi ngôn ngữ. */

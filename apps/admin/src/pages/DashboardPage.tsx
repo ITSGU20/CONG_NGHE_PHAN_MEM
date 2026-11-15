@@ -268,6 +268,17 @@ export default function DashboardPage() {
         )}
       </section>
 
+      <section className="dashboard-section">
+        <div className="dashboard-section-heading">
+          <div>
+            <h2>Lượt truy cập theo ngày</h2>
+            <p>Chỉ lọc theo khoảng thời gian, không phụ thuộc bộ lọc ngôn ngữ</p>
+          </div>
+        </div>
+
+        <VisitsTable rows={s.visitsByDay} />
+      </section>
+
       <footer className="dashboard-footer">
         <span>
           Nguồn dữ liệu: {isBackendEnabled() ? 'Máy chủ Supabase' : 'Dữ liệu giả lập'}
@@ -454,6 +465,46 @@ function LineChart({
           </text>
         ))}
       </svg>
+    </div>
+  );
+}
+
+function VisitsTable({ rows }: { rows: Stats['visitsByDay'] }) {
+  if (rows.length === 0) {
+    return <div className="empty">Chưa có dữ liệu truy cập trong khoảng đã chọn.</div>;
+  }
+
+  const total = rows.reduce((sum, r) => sum + r.visits, 0);
+  const shown = [...rows].reverse(); // ngày mới nhất lên đầu
+  const fmt = (iso: string) => iso.split('-').reverse().join('/'); // 2026-11-15 thành 15/11/2026
+
+  return (
+    <div className="dashboard-table-wrapper">
+      <table className="dashboard-table">
+        <thead>
+          <tr>
+            <th>Ngày</th>
+            <th>Lượt truy cập</th>
+            <th>Người dùng</th>
+          </tr>
+        </thead>
+        <tbody>
+          {shown.map((r) => (
+            <tr key={r.date}>
+              <td>{fmt(r.date)}</td>
+              <td>{r.visits.toLocaleString('vi-VN')}</td>
+              <td>{r.users.toLocaleString('vi-VN')}</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th>Tổng lượt truy cập</th>
+            <th>{total.toLocaleString('vi-VN')}</th>
+            <th />
+          </tr>
+        </tfoot>
+      </table>
     </div>
   );
 }

@@ -737,3 +737,9 @@ th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line);
   font-size: 1.2rem;
   line-height: 1;
 }
+
+/* Bảng lượt truy cập theo ngày (dashboard) */
+.dashboard-table-wrapper { overflow-x: auto; }
+.dashboard-table th:not(:first-child),
+.dashboard-table td:not(:first-child) { text-align: right; }
+.dashboard-table tfoot th { border-top: 2px solid var(--line); }
