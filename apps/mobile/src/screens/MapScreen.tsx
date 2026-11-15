@@ -33,14 +33,15 @@ export default function MapScreen() {
         </Pressable>
       </View>
 
+      {/* Lưới 3 cột: độ rộng nút cố định theo %, không phụ thuộc việc trình duyệt tự đo chữ */}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 12, paddingBottom: 8 }}>
         {FLOORS.map((f) => (
           <Pressable
             key={f.id}
             onPress={() => setFloor(f.id)}
-            style={[common.btn, { flexShrink: 0, paddingHorizontal: 12 }, f.id === floor && common.btnPrimary]}
+            style={[common.btn, { flexBasis: '31%', flexGrow: 1, paddingHorizontal: 6 }, f.id === floor && common.btnPrimary]}
           >
-            <Text numberOfLines={1} style={[f.id === floor ? common.btnTextPrimary : common.btnText, { flexShrink: 0 }]}>
+            <Text style={[f.id === floor ? common.btnTextPrimary : common.btnText, { width: '100%', textAlign: 'center' }]}>
               {floorName(f.id, lang)}
             </Text>
           </Pressable>
