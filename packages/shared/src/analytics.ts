@@ -40,6 +40,11 @@ export function startSession(initialLang: string) {
   const timer = setInterval(() => track('heartbeat', { playing }), HEARTBEAT_MS);
   const g = globalThis as { addEventListener?: (t: string, f: () => void) => void };
   g.addEventListener?.('pagehide', () => track('session_end'));
+    const doc = (globalThis as any).document;
+  doc?.addEventListener?.('visibilitychange', () => {
+    if (doc.visibilityState === 'hidden') track('session_end');
+    else track('session_start', { lang: storage.get('ddl.lang') ?? initialLang });
+  });
   return () => {
     clearInterval(timer);
     track('session_end');

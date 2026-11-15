@@ -158,7 +158,7 @@ begin
 
   if p_name = 'session_start' then
     insert into sessions (id, device_id, lang) values (p_session, p_device, left(p_data->>'lang', 5))
-    on conflict (id) do update set last_seen = now();
+    on conflict (id) do update set last_seen = now(), ended_at = null;
 
   elsif p_name = 'heartbeat' then
     update sessions set last_seen = now(), playing = coalesce((p_data->>'playing')::boolean, false)

@@ -494,7 +494,7 @@ export async function getStats(filter: StatsFilter = {}): Promise<Stats> {
     fail(error);
     const d = data as Stats;
     const byLanguage = {} as Record<LangCode, number>;
-    LANGUAGES.forEach((l) => (byLanguage[l.code] = Number(d.byLanguage?.[l.code] ?? 0)));
+    LANGUAGES.forEach((l) => (byLanguage[l.code] = Number(d.byLanguage?.[l.code] ?? 0))); // bảng thống kế nghe theo ngôn ngữ
     return { totalUsers: Number(d.totalUsers), online: Number(d.online), playing: Number(d.playing), byLanguage, byDay: d.byDay ?? [], visitsByDay: d.visitsByDay ?? [] };
   }
   await delay(60);
