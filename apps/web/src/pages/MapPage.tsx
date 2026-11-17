@@ -92,7 +92,7 @@ export default function MapPage() {
                 </span>
                 <div>
                   <h2>{tr('list')}</h2>
-                  <p className="list-sub">Chọn tầng để xem điểm tham quan</p>
+                  <p className="list-sub">{tr('selectFloorHint')}</p>
                 </div>
               </div>
 
