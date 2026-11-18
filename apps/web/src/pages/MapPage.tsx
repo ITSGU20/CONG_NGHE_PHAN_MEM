@@ -98,7 +98,7 @@ export default function MapPage() {
 
               <div className="list-head-actions">
                 {pois.length > 0 && (
-                  <span className="total-badge" title="Số điểm đã nghe">
+                  <span className="total-badge" title={tr('mapHeardTotal')}>
                     {totalHeard}/{pois.length}
                   </span>
                 )}
@@ -106,8 +106,8 @@ export default function MapPage() {
                   type="button"
                   className="collapse-btn"
                   onClick={handleCloseSidebar}
-                  title="Đóng điểm tham quan"
-                  aria-label="Đóng điểm tham quan"
+                  title={tr('mapCloseList')}
+                  aria-label={tr('mapCloseList')}
                 >
                   <svg
                     width="18"
@@ -171,11 +171,10 @@ export default function MapPage() {
                           <div className="floor-trigger-text">
                             <b>{floorName(f.id, lang)}</b>
                             <small>
-                              {list.length > 0
-                                ? `${list.length} điểm tham quan${
-                                    heardCount > 0 ? ` · Đã nghe ${heardCount}` : ''
-                                  }`
-                                : 'Chưa có điểm thuyết minh'}
+                                {list.length > 0
+                                ? tr('mapPointCount').replace('{count}', String(list.length))
+                                : tr('mapEmptyFloor')}
+                                {heardCount > 0 && ` · ${tr('heard')} ${heardCount}`}
                             </small>
                           </div>
                         </div>
@@ -203,7 +202,7 @@ export default function MapPage() {
                         <div className="floor-collapse-inner">
                           {list.length === 0 ? (
                             <p className="floor-empty-note">
-                              Tầng này không có điểm tham quan nào.
+                              {tr('mapEmptyFloor')}
                             </p>
                           ) : (
                             <ul className="poi-sublist">
@@ -240,10 +239,10 @@ export default function MapPage() {
 
                                       <div className="poi-card-main">
                                         <div className="poi-card-header">
-                                          <b>{r.content?.name || `Điểm #${p.number}`}</b>
+                                          <b>{r.content?.name || `${tr('point')} #${p.number}`}</b>
                                           <span
                                             className="poi-type-badge"
-                                            title={p.type}
+                                            title={{outdoor: tr('typeOutdoor'), indoor: tr('typeIndoor'), mixed: tr('typeMixed'),}[p.type]}
                                           >
                                             <TypeIcon type={p.type} />
                                           </span>
@@ -251,7 +250,7 @@ export default function MapPage() {
 
                                         <p className="poi-card-desc">
                                           {r.content?.description ||
-                                            'Nhấn để xem thông tin chi tiết và nghe thuyết minh.'}
+                                            tr('mapPoiHint')}
                                         </p>
 
                                         <div className="poi-card-meta">
