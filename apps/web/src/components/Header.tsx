@@ -23,6 +23,19 @@ export default function Header() {
         <NavLink to="/map">{tr('navMap')}</NavLink>
         <NavLink to="/about">{tr('navAbout')}</NavLink>
         <a href={ADMIN_URL}>{tr('navAdmin')}</a>
+        <details className="mobile-qr">
+        <summary aria-label={tr('scanQr')}>QR</summary>
+
+        <div className="mobile-qr-panel">
+         <p>{tr('mobileQrHint')}</p>
+         <img
+          src={`${import.meta.env.BASE_URL}img/mobile-qr.png`}
+          alt={tr('scanQr')}
+          width={210}
+          height={210}
+         />
+        </div>
+        </details>
       </nav>
       <label className="langsel">
         <IconGlobe size={18} />
