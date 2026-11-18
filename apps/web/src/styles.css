@@ -592,7 +592,17 @@ h1 { margin: 0; }
 
 /* ---------- màn hình lớn (trượt ngang mượt mà) ---------- */
 @media (min-width: 1024px) {
-  .split { flex-direction: row; height: calc(100vh - 61px); }
+  .map-page {
+  height: 100dvh;
+}
+
+.map-page > .topbar {
+  flex-shrink: 0;
+}
+
+.map-page > .split {
+  flex-direction: row;
+}
   .list {
     width: 380px;
     max-height: none;

@@ -79,7 +79,7 @@ export default function MapPage() {
   );
 
   return (
-    <div className="page">
+      <div className="page map-page">
       <Header />
       <div className="split">
         {/* SIDEBAR ĐIỂM THAM QUAN (TRƯỢT RA KHI ẤN NÚT, ĐÓNG LẠI KHI ẤN <) */}
