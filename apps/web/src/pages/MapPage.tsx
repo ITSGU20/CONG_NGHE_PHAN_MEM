@@ -256,15 +256,15 @@ export default function MapPage() {
                                         <div className="poi-card-meta">
                                           {isHeard ? (
                                             <span className="status-tag heard">
-                                              ✓ Đã nghe
+                                              ✓ {tr('heard')}
                                             </span>
                                           ) : (
                                             <span className="status-tag">
-                                              ● Chưa nghe
+                                              ● {tr('notHeard')}
                                             </span>
                                           )}
                                           <span className="action-hint">
-                                            Khám phá →
+                                            {tr('explore')} →
                                           </span>
                                         </div>
                                       </div>
